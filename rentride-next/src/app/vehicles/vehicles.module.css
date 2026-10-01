@@ -1,0 +1,327 @@
+.main {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1e293b;
+}
+
+/* ── Fleet Page 3D Canvas Banner & Styling ── */
+.fleetHeroBanner {
+  position: relative;
+  background: 
+      radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.16) 0%, transparent 45%),
+      radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+      linear-gradient(160deg, #EBF6FF 0%, #F5FAFF 55%, #F0F7FF 100%);
+  padding: 80px 0 60px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(14, 165, 233, 0.15);
+  text-align: center;
+}
+
+.fleetBannerContent {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.fleetHeroTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #0284c7;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.sectionDesc {
+  font-size: 1.1rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.section {
+  padding: 60px 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Glassmorphic 3D Filter Box ── */
+.filterGlassCard {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 12px 32px rgba(12, 60, 110, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.filterGlassCard:hover {
+  box-shadow: 0 18px 40px rgba(14, 165, 233, 0.12);
+  border-color: #38bdf8;
+}
+
+.filterForm {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.formControl {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.formControl:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 46px;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+}
+
+.btnPrimarySm {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btnPrimarySm:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+/* ── Interactive 3D Category Pills ── */
+.categoryTabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.tabBtn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  color: #475569;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tabBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
+  color: #0ea5e9;
+  border-color: #bae6fd;
+}
+
+.tabBtn.active {
+  background: #0ea5e9;
+  color: white;
+  border-color: #0ea5e9;
+}
+
+/* ── 3D Vehicle Card Hover Effects ── */
+.fleetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.vehicleCard {
+  background: #ffffff;
+  border: 1px solid rgba(14, 165, 233, 0.18);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicleCard:hover {
+  transform: translateY(-8px) rotateX(1deg) rotateY(1deg);
+  box-shadow: 0 20px 42px rgba(14, 165, 233, 0.15);
+  border-color: #38bdf8;
+}
+
+.cardImgWrapper {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.cardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.vehicleCard:hover .cardImg {
+  transform: scale(1.05);
+}
+
+.cardBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.cardRating {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fbbf24;
+  color: #78350f;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.cardBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.vehicleTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.vehicleLocation {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vehicleSpecs {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 20px;
+}
+
+.specItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.priceTag {
+  display: flex;
+  flex-direction: column;
+}
+
+.amount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.unit {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+@media (max-width: 992px) {
+  .filterForm {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .filterForm {
+    grid-template-columns: 1fr;
+  }
+}
