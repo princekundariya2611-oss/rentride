@@ -49,12 +49,15 @@
             </ul>
 
             <div class="header-actions">
-                <a href="tel:9624497998" class="btn btn-secondary btn-sm">
+                <a href="tel:9624497998" class="btn btn-secondary btn-sm mobile-hidden">
                     <i class="fa-solid fa-phone"></i> 96244 97998
                 </a>
-                <a href="{% url 'vehicles:list' %}" class="btn btn-primary btn-sm">
+                <a href="{% url 'vehicles:list' %}" class="btn btn-primary btn-sm mobile-hidden">
                     <i class="fa-solid fa-car"></i> Rent Now
                 </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>

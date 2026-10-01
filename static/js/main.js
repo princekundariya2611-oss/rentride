@@ -3,6 +3,23 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ── 0. Mobile Menu Toggle ──
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.querySelector('.nav-links');
+    if (mobileMenuBtn && navLinks) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    }
+
     // ── 1. Vehicle Detail Page Live Price Calculator ──
     const startDateInput = document.getElementById('id_start_date');
     const endDateInput = document.getElementById('id_end_date');
