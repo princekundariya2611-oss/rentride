@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Fleet | WheelX Vehicle Rentals Morbi{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Fleet Page 3D Canvas Banner & Styling ── */
+    .fleet-hero-banner {
+        position: relative;
+        background:
+            radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.16) 0%, transparent 45%),
+            radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+            linear-gradient(160deg, #EBF6FF 0%, #F5FAFF 55%, #F0F7FF 100%);
+        padding: 55px 0 45px;
+        overflow: hidden;
+        border-bottom: 1.5px solid rgba(14, 165, 233, 0.15);
+        perspective: 1000px;
+    }
+
+    #fleet-3d-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .fleet-banner-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .fleet-hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1.5px solid rgba(14, 165, 233, 0.3);
+        color: var(--accent-blue-dark);
+        padding: 6px 18px;
+        border-radius: var(--radius-full);
+        font-size: 0.82rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        text-transform: uppercase;
+    }
+
+    /* ── Glassmorphic 3D Filter Box ── */
+    .filter-glass-card {
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+        border: 1.5px solid rgba(14, 165, 233, 0.25);
+        border-radius: var(--radius-lg);
+        padding: 26px;
+        margin-bottom: 38px;
+        box-shadow: 0 12px 32px rgba(12, 60, 110, 0.09);
+        transform-style: preserve-3d;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .filter-glass-card:hover {
+        box-shadow: 0 18px 40px rgba(14, 165, 233, 0.18);
+        border-color: var(--accent-blue);
+    }
+
+    /* ── Interactive 3D Category Pills ── */
+    .tab-btn {
+        transform-style: preserve-3d;
+        transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .tab-btn:hover {
+        transform: translateY(-3px) translateZ(6px);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.28);
+    }
+
+    /* ── 3D Vehicle Card Hover Effects ── */
+    .vehicle-card {
+        transform-style: preserve-3d;
+        transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+        background: #FFFFFF;
+        border: 1.5px solid rgba(14, 165, 233, 0.18);
+    }
+
+    .vehicle-card:hover {
+        transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
+        box-shadow: 0 20px 42px rgba(14, 165, 233, 0.22);
+        border-color: var(--accent-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 3D Header Banner -->
+<div class="fleet-hero-banner">
+    <canvas id="fleet-3d-canvas"></canvas>
+    <div class="container fleet-banner-content">
+        <div class="section-header" style="margin-bottom: 0;">
+            <span class="fleet-hero-tag"><i class="fa-solid fa-car-side"></i> WheelX Inventory</span>
+            <h1 class="section-title" style="font-size: 2.8rem; margin-bottom: 12px;">Explore Vehicles in Morbi</h1>
+            <p class="section-desc" style="max-width: 580px; margin: 0 auto;">Filter by vehicle type, search your favorite brand, or sort by daily rental price with instant pickup in Morbi.</p>
+        </div>
+    </div>
+</div>
+
+<section class="section" style="padding-top: 40px;">
+    <div class="container">
+
+        <!-- Search & Filter Controls -->
+        <div class="filter-glass-card">
+            <form method="GET" action="{% url 'vehicles:list' %}" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: flex-end;">
+                <div>
+                    <label class="form-label"><i class="fa-solid fa-magnifying-glass" style="color: var(--accent-blue);"></i> Search Vehicle / Brand</label>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search Creta, Thar, Honda, Bullet..." style="background: #F8FAFC;">
+                </div>
+                <div>
+                    <label class="form-label"><i class="fa-solid fa-layer-group" style="color: var(--accent-blue);"></i> Vehicle Type</label>
+                    <select name="type" class="form-control" style="background: #F8FAFC;">
+                        <option value="">All Types</option>
+                        <option value="CAR" {% if vehicle_type == 'CAR' %}selected{% endif %}>Cars & SUVs</option>
+                        <option value="BIKE" {% if vehicle_type == 'BIKE' %}selected{% endif %}>Bikes & Scooters</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label"><i class="fa-solid fa-arrow-down-short-wide" style="color: var(--accent-blue);"></i> Sort By</label>
+                    <select name="sort" class="form-control" style="background: #F8FAFC;">
+                        <option value="">Default</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="height: 46px; padding: 0 28px;">
+                        <i class="fa-solid fa-sliders"></i> Filter Fleet
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Category Pills -->
+        {% if categories %}
+        <div class="category-tabs">
+            <a href="{% url 'vehicles:list' %}" class="tab-btn {% if not selected_category %}active{% endif %}">
+                <i class="fa-solid fa-grip"></i> All Categories
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'vehicles:list' %}?category={{ cat.slug }}" class="tab-btn {% if selected_category.slug == cat.slug %}active{% endif %}">
+                <i class="fa-solid {{ cat.icon }}"></i> {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Fleet Grid -->
+        <div class="fleet-grid">
+            {% if vehicles %}
+                {% for vehicle in vehicles %}
+                <div class="vehicle-card" data-category="{{ vehicle.category.slug }}">
+                    <div class="card-img-wrapper">
+                        <img src="{{ vehicle.get_display_image }}" alt="{{ vehicle.name }}" onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                        <span class="card-badge">{{ vehicle.category.name }}</span>
+                        <span class="card-rating"><i class="fa-solid fa-star"></i> {{ vehicle.rating }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="vehicle-title">{{ vehicle.brand }} {{ vehicle.name }}</h3>
+                        <div class="vehicle-location">
+                            <i class="fa-solid fa-location-dot" style="color: var(--accent-gold);"></i> {{ vehicle.location }}
+                        </div>
+                        <div class="vehicle-specs">
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gas-pump"></i>
+                                <span>{{ vehicle.fuel_type }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gear"></i>
+                                <span>{{ vehicle.transmission }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-users"></i>
+                                <span>{{ vehicle.seats }} Seats</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="price-tag">
+                                <span class="amount">₹{{ vehicle.price_per_day|floatformat:0 }}</span>
+                                <span class="unit">/ 24 hrs</span>
+                            </div>
+                            <a href="{% url 'vehicles:detail' vehicle.id %}" class="btn btn-primary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px; background: var(--bg-card); border-radius: var(--radius-lg);">
+                    <i class="fa-solid fa-car-burst" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 16px;"></i>
+                    <h3>No vehicles matched your search filter.</h3>
+                    <p style="color: var(--text-secondary); margin-top: 8px;">Try clearing filters or call WheelX team at <strong>+91 96244 97998</strong> for offline vehicles in Morbi.</p>
+                    <a href="{% url 'vehicles:list' %}" class="btn btn-secondary" style="margin-top: 20px;">Clear Filters</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

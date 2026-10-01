@@ -1,0 +1,822 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}WheelX | Best Car & Bike Rentals in Morbi{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Hero Background & 3D Layering ── */
+    .hero {
+        position: relative;
+        background:
+            radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.18) 0%, transparent 45%),
+            radial-gradient(circle at 10% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+            linear-gradient(160deg, #EBF6FF 0%, #F5FAFF 55%, #F0F7FF 100%);
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        perspective: 1000px;
+    }
+
+    #hero-3d-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .hero-grid {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 48px;
+        align-items: center;
+        width: 100%;
+    }
+
+    @media (max-width: 992px) {
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 36px;
+        }
+    }
+
+    /* ── Hero Text & Search Card ── */
+    .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1.5px solid rgba(14, 165, 233, 0.3);
+        color: var(--accent-blue-dark);
+        padding: 7px 18px;
+        border-radius: var(--radius-full);
+        font-size: 0.84rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+        letter-spacing: 0.3px;
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-title {
+        font-size: 3.4rem;
+        line-height: 1.12;
+        margin-bottom: 18px;
+        color: var(--accent-navy);
+        font-weight: 900;
+        letter-spacing: -0.5px;
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, var(--accent-blue), #0369A1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.08rem;
+        margin-bottom: 28px;
+        line-height: 1.75;
+    }
+
+    .hero-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1.5px solid rgba(14, 165, 233, 0.25);
+        border-radius: var(--radius-lg);
+        padding: 26px;
+        box-shadow: 0 12px 36px rgba(12, 60, 110, 0.1);
+        transform-style: preserve-3d;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 32px;
+        margin-top: 30px;
+        padding-top: 24px;
+        border-top: 1.5px solid rgba(14, 165, 233, 0.18);
+    }
+
+    .stat-item h3 {
+        font-size: 1.9rem;
+        color: var(--accent-blue);
+        font-weight: 800;
+    }
+
+    .stat-item p {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin-top: 2px;
+        font-weight: 600;
+    }
+
+    /* ── Hero Car Image Showcase ── */
+    .hero-showcase {
+        position: relative;
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .hero-car-pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .hero-car-card {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1.5px solid rgba(14, 165, 233, 0.3);
+        position: relative;
+        box-shadow: 0 10px 28px rgba(12, 60, 110, 0.12);
+        transform-style: preserve-3d;
+        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+        background: #FFFFFF;
+        animation: float3D 6s ease-in-out infinite alternate;
+    }
+
+    .hero-car-pair:nth-child(2) .hero-car-card {
+        animation-delay: -3s;
+    }
+
+    @keyframes float3D {
+        0% { transform: translateY(0px) rotateX(0deg); }
+        100% { transform: translateY(-10px) rotateX(2deg); }
+    }
+
+    .hero-car-card:hover {
+        transform: translateY(-10px) rotateY(4deg) scale(1.02) !important;
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.28);
+        border-color: var(--accent-blue);
+    }
+
+    .hero-car-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .hero-car-card:hover img {
+        transform: scale(1.08);
+    }
+
+    .hero-car-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(12, 60, 110, 0.88);
+        color: #FFF;
+        padding: 4px 11px;
+        border-radius: var(--radius-full);
+        font-size: 0.74rem;
+        font-weight: 700;
+        backdrop-filter: blur(6px);
+    }
+
+    .hero-car-price {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, #0EA5E9, #0284C7);
+        color: #FFF;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 0.74rem;
+        font-weight: 800;
+        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+    }
+
+    /* ── Scrolling Brand Strip ── */
+    .brand-strip {
+        background: var(--accent-navy);
+        padding: 16px 0;
+        overflow: hidden;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-strip-inner {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        animation: slideLeft 26s linear infinite;
+        width: max-content;
+    }
+
+    @keyframes slideLeft {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    .brand-pill {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 22px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+        transition: var(--transition);
+    }
+
+    .brand-pill i {
+        color: #7DD3FC;
+        font-size: 1rem;
+    }
+
+    .brand-pill:hover {
+        background: rgba(255, 255, 255, 0.22);
+        color: #FFF;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ── Brands by Company Section ── */
+    .brand-section {
+        padding: 60px 0;
+        background: #EBF5FF;
+    }
+
+    .brand-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        gap: 18px;
+    }
+
+    .brand-card {
+        background: #FFFFFF;
+        border: 1.5px solid rgba(14, 165, 233, 0.18);
+        border-radius: var(--radius-lg);
+        padding: 24px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: block;
+        box-shadow: var(--shadow-sm);
+        transform-style: preserve-3d;
+    }
+
+    .brand-card:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-6px) translateZ(6px);
+        box-shadow: 0 12px 30px rgba(14, 165, 233, 0.22);
+        color: var(--accent-navy);
+    }
+
+    .brand-card-icon {
+        font-size: 2rem;
+        color: var(--accent-blue);
+        margin-bottom: 10px;
+    }
+
+    .brand-card h4 {
+        font-size: 0.98rem;
+        margin-bottom: 4px;
+        color: var(--accent-navy);
+        font-weight: 700;
+    }
+
+    .brand-card span {
+        font-size: 0.76rem;
+        color: var(--text-secondary);
+    }
+
+    /* Interactive 3D Fleet Cards */
+    .vehicle-card {
+        transform-style: preserve-3d;
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════ HERO SECTION WITH 3D CANVAS ═══════════ -->
+<section class="hero">
+    <canvas id="hero-3d-canvas"></canvas>
+    <div class="container" style="padding: 60px 20px;">
+        <div class="hero-grid">
+            <!-- LEFT: Text & CTA -->
+            <div>
+                <div class="hero-tag">
+                    <i class="fa-solid fa-shield-halved"></i> Premier Vehicle Rentals in Morbi
+                </div>
+                <h1 class="hero-title">
+                    Drive India's Best Cars With <span>WheelX</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Rent top-condition Maruti, Hyundai, Tata, Mahindra, Toyota cars and Royal Enfield, Honda, TVS bikes
+                    in Morbi at unbeatable daily rates. Instant pickup, zero hidden fees.
+                </p>
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 30px;">
+                    <a href="{% url 'vehicles:list' %}" class="btn btn-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i> Browse All Vehicles
+                    </a>
+                    <a href="https://wa.me/919624497998" target="_blank" class="btn btn-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i> Quick Book (+91 96244 97998)
+                    </a>
+                </div>
+
+                <!-- Hero Quick Search -->
+                <div class="hero-card">
+                    <h3 class="search-widget-title">
+                        <i class="fa-solid fa-car-side" style="color: var(--accent-gold);"></i> Find Your Ride Instantly
+                    </h3>
+                    <form action="{% url 'vehicles:list' %}" method="GET">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Vehicle Type</label>
+                                <select name="type" class="form-control">
+                                    <option value="">All (Cars & Bikes)</option>
+                                    <option value="CAR">Cars & SUVs</option>
+                                    <option value="BIKE">Bikes & Scooters</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sort By</label>
+                                <select name="sort" class="form-control">
+                                    <option value="">Default</option>
+                                    <option value="price_low">Price: Low to High</option>
+                                    <option value="price_high">Price: High to Low</option>
+                                    <option value="rating">Highest Rated</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Search Brand or Model</label>
+                            <input type="text" name="q" class="form-control"
+                                placeholder="e.g. Creta, Thar, Royal Enfield, Swift...">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fa-solid fa-sliders"></i> Search Available Rides
+                        </button>
+                    </form>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h3>15+</h3>
+                        <p>Vehicles in Morbi</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>8</h3>
+                        <p>Top Indian Brands</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>4.9★</h3>
+                        <p>Customer Rating</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>24/7</h3>
+                        <p>Live Support</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Live Car Image Showcase -->
+            <div class="hero-showcase">
+                <div class="hero-car-pair">
+                    <div class="hero-car-card">
+                        <img src="{% static 'image/vehicle/thar.png' %}" alt="Mahindra Thar" onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                        <span class="hero-car-label">Mahindra Thar 4x4</span>
+                        <span class="hero-car-price">₹3,800/day</span>
+                    </div>
+                    <div class="hero-car-card">
+                        <img src="{% static 'image/vehicle/creta.png' %}" alt="Hyundai Creta" onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                        <span class="hero-car-label">Hyundai Creta SX(O)</span>
+                        <span class="hero-car-price">₹3,200/day</span>
+                    </div>
+                </div>
+                <div class="hero-car-pair">
+                    <div class="hero-car-card">
+                        <img src="{% static 'image/vehicle/classic350.png' %}" alt="Royal Enfield Classic 350" onerror="this.src='{% static 'image/vehicle/bike.png' %}'">
+                        <span class="hero-car-label">Royal Enfield Classic 350</span>
+                        <span class="hero-car-price">₹1,200/day</span>
+                    </div>
+                    <div class="hero-car-card">
+                        <img src="{% static 'image/vehicle/fortuner.png' %}" alt="Toyota Fortuner" onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                        <span class="hero-car-label">Toyota Fortuner Legender</span>
+                        <span class="hero-car-price">₹7,500/day</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ SCROLLING BRAND STRIP ═══════════ -->
+<div class="brand-strip">
+    <div class="brand-strip-inner">
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Maruti Suzuki</div>
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Hyundai</div>
+        <div class="brand-pill"><i class="fa-solid fa-truck-monster"></i> Mahindra</div>
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Toyota</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> Royal Enfield</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> Honda</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> TVS Motors</div>
+        <!-- Duplicate for seamless loop -->
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Maruti Suzuki</div>
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Hyundai</div>
+        <div class="brand-pill"><i class="fa-solid fa-truck-monster"></i> Mahindra</div>
+        <div class="brand-pill"><i class="fa-solid fa-car"></i> Toyota</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> Royal Enfield</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> Honda</div>
+        <div class="brand-pill"><i class="fa-solid fa-motorcycle"></i> TVS Motors</div>
+    </div>
+</div>
+
+<!-- ═══════════ SHOP BY BRAND ═══════════ -->
+<section class="brand-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">Browse by Company</span>
+            <h2 class="section-title">Filter by Your Favourite Brand</h2>
+            <p class="section-desc">WheelX offers vehicles from India's most trusted automotive companies.</p>
+        </div>
+
+        <div class="brand-cards-grid">
+            <a href="{% url 'vehicles:list' %}?q=maruti" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-car-side"></i></div>
+                <h4>Maruti Suzuki</h4>
+                <span>Swift, Baleno, Ertiga</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=hyundai" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-car"></i></div>
+                <h4>Hyundai</h4>
+                <span>Creta, i20, Venue</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=mahindra" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-truck-monster"></i></div>
+                <h4>Mahindra</h4>
+                <span>Thar, Scorpio-N, XUV700</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=toyota" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-car"></i></div>
+                <h4>Toyota</h4>
+                <span>Fortuner, Innova HyCross</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=royal+enfield" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                <h4>Royal Enfield</h4>
+                <span>Classic 350, Meteor 350</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=honda" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                <h4>Honda</h4>
+                <span>Activa 6G, Shine 125</span>
+            </a>
+            <a href="{% url 'vehicles:list' %}?q=tvs" class="brand-card">
+                <div class="brand-card-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                <h4>TVS Motors</h4>
+                <span>Apache RTR 160, Jupiter</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ INTERACTIVE FARE CALCULATOR SECTION ═══════════ -->
+<section class="section" style="background: linear-gradient(135deg, #F0F7FF 0%, #E2F1FF 100%); border-top: 1.5px solid rgba(14, 165, 233, 0.15); border-bottom: 1.5px solid rgba(14, 165, 233, 0.15); padding: 60px 0;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle"><i class="fa-solid fa-calculator"></i> Transparent Pricing</span>
+            <h2 class="section-title">Instant Rental Fare Estimator</h2>
+            <p class="section-desc">Calculate exact rental charges, GST, security deposits, and optional add-ons in real time for any ride in Morbi.</p>
+        </div>
+
+        <div style="max-width: 960px; margin: 0 auto; background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.22); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center;">
+            <!-- Left: Controls & Options -->
+            <div>
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Select Vehicle Model</label>
+                    <select id="home_calc_vehicle" class="form-control" style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                        {% if featured_vehicles %}
+                            {% for vehicle in featured_vehicles %}
+                                <option value="{{ vehicle.id }}" data-price="{{ vehicle.price_per_day }}" data-type="{{ vehicle.vehicle_type }}" data-name="{{ vehicle.brand }} {{ vehicle.name }}">
+                                    {{ vehicle.brand }} {{ vehicle.name }} (₹{{ vehicle.price_per_day|floatformat:0 }}/day)
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="1" data-price="3800" data-type="CAR" data-name="Mahindra Thar 4x4">Mahindra Thar 4x4 (₹3,800/day)</option>
+                            <option value="2" data-price="3200" data-type="CAR" data-name="Hyundai Creta SX">Hyundai Creta SX (₹3,200/day)</option>
+                            <option value="3" data-price="2000" data-type="CAR" data-name="Maruti Swift ZXi">Maruti Swift ZXi (₹2,000/day)</option>
+                            <option value="4" data-price="1200" data-type="BIKE" data-name="Royal Enfield Classic 350">Royal Enfield Classic 350 (₹1,200/day)</option>
+                            <option value="5" data-price="600" data-type="BIKE" data-name="Honda Activa 6G">Honda Activa 6G (₹600/day)</option>
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 18px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Pickup Date</label>
+                        <input type="date" id="home_calc_start" class="form-control" style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Drop-off Date</label>
+                        <input type="date" id="home_calc_end" class="form-control" style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                    </div>
+                </div>
+
+                <div style="background: #F0F7FF; border: 1px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-md); padding: 14px 16px;">
+                    <label style="font-weight: 700; color: var(--accent-navy); font-size: 0.88rem; display: block; margin-bottom: 10px;">
+                        <i class="fa-solid fa-sliders" style="color: var(--accent-blue);"></i> Add-on Services
+                    </label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                            <span><input type="checkbox" id="home_addon_insurance" style="accent-color: var(--accent-blue);"> Zero-Dep Liability Protection</span>
+                            <strong style="color: var(--accent-blue-dark);">+₹150/day</strong>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                            <span><input type="checkbox" id="home_addon_unlimited" style="accent-color: var(--accent-blue);"> Unlimited Kilometres Pass</span>
+                            <strong style="color: var(--accent-blue-dark);">+₹250/day</strong>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                            <span><input type="checkbox" id="home_addon_delivery" style="accent-color: var(--accent-blue);"> Doorstep Pickup/Drop in Morbi</span>
+                            <strong style="color: var(--accent-blue-dark);">+₹200 flat</strong>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Real-time Live Calculation Display Card -->
+            <div style="background: linear-gradient(145deg, #0C3C6E 0%, #0284C7 100%); border-radius: var(--radius-md); padding: 26px; color: #FFFFFF; box-shadow: 0 10px 28px rgba(12, 60, 110, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.18);">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #7DD3FC; text-transform: uppercase; letter-spacing: 0.5px;">Fare Summary</span>
+                    <span id="home_out_days" style="background: rgba(255,255,255,0.15); color: #FFF; padding: 2px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 800;">1 Day</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.92; margin-bottom: 8px;">
+                    <span>Daily Rate</span>
+                    <span id="home_out_rate" style="font-weight: 700;">₹0/day</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.92; margin-bottom: 8px;">
+                    <span>Base Vehicle Charges</span>
+                    <span id="home_out_base" style="font-weight: 700;">₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.92; margin-bottom: 8px;">
+                    <span>Add-ons Total</span>
+                    <span id="home_out_addons" style="font-weight: 700;">₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.92; margin-bottom: 8px;">
+                    <span>GST (18%)</span>
+                    <span id="home_out_gst" style="font-weight: 700;">₹0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.92; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.25);">
+                    <span>Refundable Deposit</span>
+                    <span id="home_out_deposit" style="font-weight: 700; color: #7DD3FC;">₹1,000</span>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 600; display: block;">Estimated Grand Total</span>
+                    <span id="home_out_grand" style="font-size: 2.2rem; font-weight: 900; color: #FFFFFF; letter-spacing: -0.5px;">₹0</span>
+                </div>
+
+                <a id="home_out_wa_btn" href="https://wa.me/919624497998" target="_blank" class="btn btn-whatsapp" style="width: 100%; padding: 12px; font-weight: 800; font-size: 0.98rem; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Reserve Estimated Fare on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">WheelX Top Picks</span>
+            <h2 class="section-title">Most Booked Rides in Morbi</h2>
+            <p class="section-desc">Our handpicked fleet of premium cars and bikes — all from top Indian brands.</p>
+        </div>
+
+        <div class="fleet-grid">
+            {% if featured_vehicles %}
+            {% for vehicle in featured_vehicles %}
+            <div class="vehicle-card" data-category="{{ vehicle.category.slug }}">
+                <div class="card-img-wrapper">
+                    <img src="{{ vehicle.get_display_image }}" alt="{{ vehicle.brand }} {{ vehicle.name }}"
+                        onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                    <span class="card-badge">{{ vehicle.brand }}</span>
+                    <span class="card-rating"><i class="fa-solid fa-star"></i> {{ vehicle.rating }}</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="vehicle-title">{{ vehicle.name }}</h3>
+                    <div class="vehicle-location">
+                        <i class="fa-solid fa-location-dot" style="color: var(--accent-blue);"></i> {{ vehicle.location }} &nbsp;|&nbsp; <i class="fa-solid fa-tag" style="color: var(--accent-blue);"></i> {{ vehicle.category.name }}
+                    </div>
+                    <div class="vehicle-specs">
+                        <div class="spec-item">
+                            <i class="fa-solid fa-gas-pump"></i>
+                            <span>{{ vehicle.fuel_type }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>{{ vehicle.transmission }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-users"></i>
+                            <span>{{ vehicle.seats }} Seats</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price-tag">
+                            <span class="amount">₹{{ vehicle.price_per_day|floatformat:0 }}</span>
+                            <span class="unit"> / day</span>
+                        </div>
+                        <a href="{% url 'vehicles:detail' vehicle.id %}" class="btn btn-primary btn-sm">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div
+                style="grid-column: 1 / -1; text-align: center; padding: 40px; background: var(--bg-card); border-radius: var(--radius-lg);">
+                <h3>Fleet loading — Call WheelX at <strong>+91 96244 97998</strong> for live availability.</h3>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 45px;">
+            <a href="{% url 'vehicles:list' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-layer-group"></i> View All 15+ Vehicles
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ WHY WHEELX ═══════════ -->
+<section class="section" style="background: #EBF5FF;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">The WheelX Promise</span>
+            <h2 class="section-title">Why Morbi Trusts WheelX</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fa-solid fa-tags"></i></div>
+                <h4>Guaranteed Best Rates</h4>
+                <p>Lowest daily rental prices in Morbi for all Indian brands — no surprise charges.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fa-solid fa-pump-medical"></i></div>
+                <h4>100% Sanitized Vehicles</h4>
+                <p>Every car and bike is deep cleaned, serviced, and safety inspected before your ride.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fa-solid fa-headset"></i></div>
+                <h4>24/7 WheelX Helpdesk</h4>
+                <p>Call or WhatsApp us anytime at <strong>+91 96244 97998</strong> for instant help on any road.</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon"><i class="fa-solid fa-key"></i></div>
+                <h4>Easy Self-Drive</h4>
+                <p>Seamless document verification, flexible dates, and unlimited km packages in Morbi.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ CUSTOMER REVIEWS & TESTIMONIALS ═══════════ -->
+<section class="section" style="background: #FFFFFF;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle"><i class="fa-solid fa-star" style="color: #F59E0B;"></i> Verified Customer Reviews</span>
+            <h2 class="section-title">Loved by Morbi Locals & Travelers</h2>
+            <p class="section-desc">See why hundreds of business travelers, tourists, and Morbi residents choose WheelX for self-drive cars & bikes.</p>
+        </div>
+
+        <!-- Overall Rating Banner -->
+        <div style="background: linear-gradient(135deg, #F0F7FF, #E0F2FE); border: 1.5px solid rgba(14, 165, 233, 0.25); border-radius: var(--radius-lg); padding: 20px 30px; max-width: 780px; margin: 0 auto 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="font-size: 2.8rem; font-weight: 900; color: var(--accent-navy); line-height: 1;">4.9</div>
+                <div>
+                    <div style="color: #F59E0B; font-size: 1.15rem; margin-bottom: 2px;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <span style="font-size: 0.88rem; font-weight: 700; color: var(--accent-navy);">Average Customer Rating in Morbi</span>
+                    <span style="display: block; font-size: 0.78rem; color: var(--text-secondary);">Based on 150+ verified trip completions</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <span style="background: #FFFFFF; color: var(--accent-blue-dark); border: 1px solid rgba(14, 165, 233, 0.25); padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
+                    <i class="fa-solid fa-circle-check" style="color: #10B981;"></i> 100% Verified Reviews
+                </span>
+            </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            
+            <!-- Review 1 -->
+            <div style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.18); border-radius: var(--radius-lg); padding: 26px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition); box-shadow: var(--shadow-sm);" onmouseover="this.style.transform='translateY(-6px)'; this.style.borderColor='var(--accent-blue)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(14, 165, 233, 0.18)';">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div style="color: #F59E0B; font-size: 0.95rem;">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span style="background: #E0F2FE; color: var(--accent-blue-dark); font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 10px;">Mahindra Thar 4x4</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; margin-bottom: 20px; font-style: italic;">
+                        "Rented the Thar 4x4 for a 3-day business trip to Morbi ceramic plants. The vehicle was spotlessly clean, pickup at Luxuria Business Park took under 2 minutes with paperless KYC, and the driving experience was flawless!"
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(14, 165, 233, 0.12); padding-top: 14px;">
+                    <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #0C3C6E, #0284C7); color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+                        PP
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.96rem; color: var(--accent-navy); margin: 0; font-weight: 700;">Priyesh Patel</h4>
+                        <span style="font-size: 0.78rem; color: var(--text-secondary);">Ceramic Industry Business Client, Morbi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 2 -->
+            <div style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.18); border-radius: var(--radius-lg); padding: 26px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition); box-shadow: var(--shadow-sm);" onmouseover="this.style.transform='translateY(-6px)'; this.style.borderColor='var(--accent-blue)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(14, 165, 233, 0.18)';">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div style="color: #F59E0B; font-size: 0.95rem;">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span style="background: #E0F2FE; color: var(--accent-blue-dark); font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 10px;">Classic 350</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; margin-bottom: 20px; font-style: italic;">
+                        "Booked a Royal Enfield Classic 350 for a weekend road trip to Dwarka and Somnath. Smooth engine, zero mechanical issues, and the helmet provided was clean and fresh. Best bike rental service in Gujarat!"
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(14, 165, 233, 0.12); padding-top: 14px;">
+                    <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #10B981, #047857); color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+                        AM
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.96rem; color: var(--accent-navy); margin: 0; font-weight: 700;">Aniket Mehta</h4>
+                        <span style="font-size: 0.78rem; color: var(--text-secondary);">Tourist from Ahmedabad</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 3 -->
+            <div style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.18); border-radius: var(--radius-lg); padding: 26px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition); box-shadow: var(--shadow-sm);" onmouseover="this.style.transform='translateY(-6px)'; this.style.borderColor='var(--accent-blue)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(14, 165, 233, 0.18)';">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div style="color: #F59E0B; font-size: 0.95rem;">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <span style="background: #E0F2FE; color: var(--accent-blue-dark); font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 10px;">Hyundai Creta</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; margin-bottom: 20px; font-style: italic;">
+                        "The real-time price calculator and online document upload made booking so effortless. Refundable deposit was transferred back immediately upon vehicle return. 100% transparent!"
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(14, 165, 233, 0.12); padding-top: 14px;">
+                    <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #8B5CF6, #6366F1); color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+                        PS
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.96rem; color: var(--accent-navy); margin: 0; font-weight: 700;">Dr. Pooja Shah</h4>
+                        <span style="font-size: 0.78rem; color: var(--text-secondary);">Medical Consultant, Rajkot</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ CALL TO ACTION BANNER ═══════════ -->
+<section class="section">
+    <div class="container">
+        <div
+            style="background: linear-gradient(135deg, #0C3C6E, #0B4F8A); border: none; border-radius: var(--radius-lg); padding: 60px 40px; text-align: center; box-shadow: 0 16px 48px rgba(12,60,110,0.25);">
+            <span
+                style="background: #7DD3FC; color: #0C3C6E; font-size: 0.75rem; font-weight: 800; padding: 4px 14px; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 1px;">Limited
+                Availability — Book Today</span>
+            <h2 style="font-size: 2.4rem; margin: 20px 0 14px; color: #FFFFFF;">Need a Car or Bike in Morbi Right Now?</h2>
+            <p style="color: rgba(255, 255, 255, 0.88); max-width: 580px; margin: 0 auto 32px; font-size: 1.05rem;">Call WheelX or chat
+                instantly on WhatsApp for same-day rental confirmation for any Indian brand vehicle.</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a href="tel:9624497998" class="btn btn-primary" style="font-size: 1rem; padding: 14px 28px;">
+                    <i class="fa-solid fa-phone"></i> Call +91 96244 97998
+                </a>
+                <a href="https://wa.me/919624497998" target="_blank" class="btn btn-whatsapp"
+                    style="font-size: 1rem; padding: 14px 28px;">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Now
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

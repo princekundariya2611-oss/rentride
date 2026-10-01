@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact WheelX Morbi | 24/7 Self-Drive Vehicle Support{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── 3D Hero Banner ── */
+    .contact-hero-3d {
+        position: relative;
+        background:
+            radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.18) 0%, transparent 45%),
+            radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+            linear-gradient(160deg, #EBF6FF 0%, #F5FAFF 55%, #F0F7FF 100%);
+        padding: 65px 0 50px;
+        overflow: hidden;
+        border-bottom: 1.5px solid rgba(14, 165, 233, 0.18);
+        perspective: 1000px;
+    }
+
+    #contact-3d-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .contact-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-3d-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1.5px solid rgba(14, 165, 233, 0.3);
+        color: var(--accent-blue-dark);
+        padding: 6px 18px;
+        border-radius: var(--radius-full);
+        font-size: 0.82rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(8px);
+        text-transform: uppercase;
+    }
+
+    /* ── 4D Glassmorphism Dynamic Cards ── */
+    .contact-card-4d {
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(18px);
+        border: 1.5px solid rgba(14, 165, 233, 0.22);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 12px 36px rgba(12, 60, 110, 0.08);
+        padding: 34px;
+        transform-style: preserve-3d;
+        transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-card-4d:hover {
+        box-shadow: 0 20px 48px rgba(14, 165, 233, 0.2);
+        border-color: var(--accent-blue);
+        transform: translateY(-6px) rotateX(1deg) rotateY(1deg);
+    }
+
+    /* Info Tiles */
+    .info-tile-3d {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 18px;
+        background: #F0F7FF;
+        border: 1.5px solid rgba(14, 165, 233, 0.18);
+        border-radius: var(--radius-md);
+        margin-bottom: 16px;
+        transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+        transform-style: preserve-3d;
+    }
+
+    .info-tile-3d:hover {
+        background: #E0F2FE;
+        border-color: var(--accent-blue);
+        transform: translateX(6px) translateZ(8px);
+    }
+
+    .info-tile-icon-3d {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0EA5E9, #0284C7);
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+    }
+
+    .info-tile-whatsapp-3d {
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+    }
+
+    /* Hub Cards */
+    .hub-card-3d {
+        background: #FFFFFF;
+        border: 1.5px solid rgba(14, 165, 233, 0.18);
+        border-radius: var(--radius-md);
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        transform-style: preserve-3d;
+    }
+
+    .hub-card-3d:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-6px) translateZ(6px);
+        box-shadow: 0 12px 28px rgba(14, 165, 233, 0.18);
+    }
+
+    .hub-icon-3d {
+        width: 48px;
+        height: 48px;
+        background: rgba(14, 165, 233, 0.12);
+        color: var(--accent-blue-dark);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    /* FAQ 3D Cards */
+    .faq-box-3d {
+        background: #FFFFFF;
+        border: 1.5px solid rgba(14, 165, 233, 0.18);
+        border-radius: var(--radius-md);
+        padding: 22px 26px;
+        margin-bottom: 16px;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        transform-style: preserve-3d;
+    }
+
+    .faq-box-3d:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-4px) translateZ(4px);
+        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.14);
+    }
+
+    .faq-box-3d h4 {
+        color: var(--accent-navy);
+        font-size: 1.05rem;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+    }
+
+    .faq-box-3d p {
+        color: var(--text-secondary);
+        font-size: 0.92rem;
+        margin: 0;
+        line-height: 1.65;
+    }
+
+    .featured-fleet-section {
+        background: linear-gradient(180deg, #F8FAFC 0%, #EBF5FF 100%);
+        padding: 60px 0;
+        border-top: 1.5px solid rgba(14, 165, 233, 0.15);
+        border-bottom: 1.5px solid rgba(14, 165, 233, 0.15);
+    }
+
+    .vehicle-card {
+        transform-style: preserve-3d;
+        transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .vehicle-card:hover {
+        transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
+        box-shadow: 0 20px 42px rgba(14, 165, 233, 0.22);
+        border-color: var(--accent-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════ 3D DYNAMIC HERO BANNER ═══════════ -->
+<section class="contact-hero-3d">
+    <canvas id="contact-3d-canvas"></canvas>
+    <div class="container contact-hero-content">
+        <div class="section-header" style="margin-bottom: 0;">
+            <span class="hero-3d-badge"><i class="fa-solid fa-headset"></i> 24/7 SUPPORT DESK</span>
+            <h1 class="section-title" style="font-size: 3rem; margin-bottom: 14px;">Connect With WheelX Morbi</h1>
+            <p class="section-desc" style="max-width: 640px; margin: 0 auto; font-size: 1.08rem;">Have questions about self-drive rentals, rates, or custom packages? Call, WhatsApp, or drop by our Morbi office anytime.</p>
+            <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="tel:9624497998" class="btn btn-primary" style="padding: 12px 24px;">
+                    <i class="fa-solid fa-phone"></i> Call Direct: +91 96244 97998
+                </a>
+                <a href="https://wa.me/919624497998?text=Hello%20WheelX,%20I%20have%20an%20inquiry%20regarding%20vehicle%20rentals." target="_blank" class="btn btn-whatsapp" style="padding: 12px 24px;">
+                    <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 4D DYNAMIC MAIN CONTACT GRID ═══════════ -->
+<section class="section" style="padding-top: 50px;">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 36px; align-items: flex-start;">
+            
+            <!-- Left: Business Info & Direct Channels -->
+            <div class="contact-card-4d">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1.5px solid rgba(14, 165, 233, 0.15);">
+                    <div>
+                        <h3 style="font-size: 1.65rem; color: var(--accent-navy); margin-bottom: 2px;">WheelX Morbi HQ</h3>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.92rem;">Premier self-drive vehicle rental hub in Morbi, Gujarat.</p>
+                    </div>
+                    <span style="background: linear-gradient(135deg, #0EA5E9, #0284C7); color: #FFF; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">VERIFIED HQ</span>
+                </div>
+                
+                <!-- Founder & Managing Director -->
+                <div class="info-tile-3d">
+                    <div class="info-tile-icon-3d" style="background: linear-gradient(135deg, #0C3C6E, #0284C7);"><i class="fa-solid fa-user-tie"></i></div>
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Founder & Managing Director</span>
+                        <h4 style="margin: 2px 0 0; color: var(--accent-navy); font-size: 1.15rem; font-weight: 800;">Prince Patel</h4>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">Direct Operations & Customer Support</span>
+                    </div>
+                </div>
+                
+                <!-- Phone Hotline -->
+                <div class="info-tile-3d">
+                    <div class="info-tile-icon-3d"><i class="fa-solid fa-phone"></i></div>
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Instant Call Hotline</span>
+                        <h4 style="margin: 2px 0 0;"><a href="tel:9624497998" style="color: var(--accent-navy); text-decoration: none; font-weight: 800; font-size: 1.25rem;">+91 96244 97998</a></h4>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">24/7 direct hotline for instant vehicle confirmation</span>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Quick Inquiry -->
+                <div class="info-tile-3d">
+                    <div class="info-tile-icon-3d info-tile-whatsapp-3d"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.5px;">WhatsApp Business Chat</span>
+                        <h4 style="margin: 2px 0 0;"><a href="https://wa.me/919624497998?text=Hello%20WheelX,%20I%20have%20an%20inquiry%20regarding%20vehicle%20rentals." target="_blank" style="color: #15803D; text-decoration: none; font-weight: 800; font-size: 1.25rem;">+91 96244 97998</a></h4>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">Instant response within 2 minutes</span>
+                    </div>
+                </div>
+
+                <!-- Office Address -->
+                <div class="info-tile-3d">
+                    <div class="info-tile-icon-3d" style="background: linear-gradient(135deg, #0C3C6E, #0284C7);"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Head Office & Central Pickup</span>
+                        <h4 style="margin: 2px 0 4px; color: var(--accent-navy); font-size: 1.05rem; font-weight: 700;">Luxuria Business Park, Mahendranagar Chokadi, Morbi, Gujarat</h4>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 8px;">Central pickup hub with instant paperless document verification</span>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Luxuria+Business+Park+Mahendranagar+Chokadi+Morbi" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #0284C7; text-decoration: none; background: #E0F2FE; padding: 6px 12px; border-radius: 8px; transition: var(--transition);">
+                            <i class="fa-solid fa-diamond-turn-right" style="color: #0284C7;"></i> Open in Google Maps
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Working Hours -->
+                <div class="info-tile-3d" style="margin-bottom: 0;">
+                    <div class="info-tile-icon-3d" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);"><i class="fa-solid fa-clock"></i></div>
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Operational Hours</span>
+                        <h4 style="margin: 2px 0 0; color: var(--accent-navy); font-size: 1.05rem; font-weight: 700;">Monday - Sunday: 7:00 AM - 10:00 PM</h4>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);">24/7 roadside assistance active for all active trips</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Dynamic Contact Form -->
+            <div class="contact-card-4d">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1.5px solid rgba(14, 165, 233, 0.15);">
+                    <div>
+                        <h3 style="font-size: 1.65rem; color: var(--accent-navy); margin-bottom: 2px;">Send Us a Message</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Fill out the form for immediate callback from WheelX team.</p>
+                    </div>
+                    <span style="background: #E0F2FE; color: var(--accent-blue-dark); padding: 5px 12px; border-radius: var(--radius-full); font-weight: 800; font-size: 0.78rem;">INSTANT DESK</span>
+                </div>
+
+                <form method="POST" action="{% url 'home:contact' %}">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);"><i class="fa-solid fa-user" style="color: var(--accent-blue);"></i> Your Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Priyesh Patel" required style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); padding: 12px 16px; font-weight: 500;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);"><i class="fa-solid fa-phone" style="color: var(--accent-blue);"></i> Phone Number</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="e.g. 9624497998" required style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); padding: 12px 16px; font-weight: 500;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 22px;">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);"><i class="fa-solid fa-message" style="color: var(--accent-blue);"></i> Message / Vehicle Requirement</label>
+                        <textarea name="message" rows="4" class="form-control" placeholder="Tell us which vehicle you need (Thar, Creta, Classic 350...), dates, or custom packages..." required style="background: #F8FAFC; border: 1.5px solid rgba(14, 165, 233, 0.25); padding: 12px 16px; font-weight: 500;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.05rem; font-weight: 700;">
+                        <i class="fa-solid fa-paper-plane"></i> Send Inquiry to WheelX Support
+                    </button>
+                </form>
+
+                <div style="margin-top: 22px; padding: 14px 18px; background: #F0F7FF; border-radius: var(--radius-md); border-left: 4px solid var(--accent-blue); font-size: 0.86rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--accent-blue);"></i> <strong>Zero Spam Guarantee:</strong> Your phone number is strictly used to communicate regarding your vehicle reservation.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══════════ MORBI PICKUP HUBS GRID ═══════════ -->
+        <div style="margin-top: 55px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <span class="section-subtitle"><i class="fa-solid fa-location-crosshairs"></i> Convenient Pickup</span>
+                <h3 style="font-size: 2rem; color: var(--accent-navy); margin-top: 4px;">WheelX Pickup Points Across Morbi</h3>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px;">
+                <div class="hub-card-3d">
+                    <div class="hub-icon-3d"><i class="fa-solid fa-building-flag"></i></div>
+                    <div>
+                        <h4 style="font-size: 1.05rem; color: var(--accent-navy); margin-bottom: 2px; font-weight: 700;">Mahendranagar Central Hub</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Luxuria Business Park, Mahendranagar Chokadi, Morbi</p>
+                    </div>
+                </div>
+                <div class="hub-card-3d">
+                    <div class="hub-icon-3d"><i class="fa-solid fa-train"></i></div>
+                    <div>
+                        <h4 style="font-size: 1.05rem; color: var(--accent-navy); margin-bottom: 2px; font-weight: 700;">Morbi Railway Station Point</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Station Road Exit, Morbi</p>
+                    </div>
+                </div>
+                <div class="hub-card-3d">
+                    <div class="hub-icon-3d"><i class="fa-solid fa-route"></i></div>
+                    <div>
+                        <h4 style="font-size: 1.05rem; color: var(--accent-navy); margin-bottom: 2px; font-weight: 700;">NH-8A Bypass Hub</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Kandla Highway Bypass, Morbi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ LIVE MAP & GPS DASHBOARD ═══════════ -->
+            <div style="margin-top: 45px;">
+                <div style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.22); border-radius: var(--radius-lg); padding: 30px; box-shadow: 0 12px 36px rgba(12, 60, 110, 0.08);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 22px;">
+                        <div>
+                            <span style="font-size: 0.78rem; font-weight: 800; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span style="width: 8px; height: 8px; background: #22C55E; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22C55E;"></span> LIVE PICKUP LOCATION & HQ
+                            </span>
+                            <h3 style="font-size: 1.6rem; color: var(--accent-navy); margin: 4px 0 0; display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-map-location-dot" style="color: var(--accent-blue);"></i> Luxuria Business Park HQ & Pickup Hub
+                            </h3>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 4px 0 0;">Mahendranagar Chokadi, Morbi, Gujarat 363642</p>
+                        </div>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="https://www.google.com/maps/search/?api=1&query=Luxuria+Business+Park+Mahendranagar+Chokadi+Morbi" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 12px 22px; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0284C7, #0C3C6E); border: none; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);">
+                                <i class="fa-solid fa-diamond-turn-right" style="font-size: 1.1rem; color: #38BDF8;"></i> Get Directions on Google Maps
+                            </a>
+                            <a href="tel:9624497998" class="btn btn-secondary" style="padding: 12px 20px; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-phone" style="color: var(--accent-blue);"></i> Call Desk
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Google Map iFrame Container -->
+                    <div style="position: relative; width: 100%; height: 420px; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(14, 165, 233, 0.2); box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
+                        <iframe 
+                            title="WheelX Morbi Luxuria Business Park Map"
+                            src="https://maps.google.com/maps?q=Luxuria%20Business%20Park,%20Mahendranagar%20Chokadi,%20Morbi,%20Gujarat&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border: 0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+
+                    <!-- Location Highlights Bar -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(14, 165, 233, 0.15);">
+                        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--accent-navy); font-weight: 600;">
+                            <i class="fa-solid fa-square-parking" style="color: var(--accent-blue); font-size: 1.25rem;"></i>
+                            <span>Free Customer Parking Available</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--accent-navy); font-weight: 600;">
+                            <i class="fa-solid fa-bolt" style="color: #EAB308; font-size: 1.25rem;"></i>
+                            <span>Fast 5-Min Paperless Verification</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--accent-navy); font-weight: 600;">
+                            <i class="fa-solid fa-taxi" style="color: #22C55E; font-size: 1.25rem;"></i>
+                            <span>Auto & Taxi Stand Adjacent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ FEATURED FLEET SHOWCASE ═══════════ -->
+<section class="featured-fleet-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle"><i class="fa-solid fa-car-side"></i> Real Fleet Inventory</span>
+            <h2 class="section-title">Popular Vehicles Available for Rent in Morbi</h2>
+            <p class="section-desc">Browse our top-rated cars and bikes with transparent daily pricing and instant booking options.</p>
+        </div>
+
+        <div class="fleet-grid">
+            {% if featured_vehicles %}
+            {% for vehicle in featured_vehicles %}
+            <div class="vehicle-card" data-category="{{ vehicle.category.slug }}">
+                <div class="card-img-wrapper">
+                    <img src="{{ vehicle.get_display_image }}" alt="{{ vehicle.brand }} {{ vehicle.name }}"
+                        onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                    <span class="card-badge">{{ vehicle.brand }}</span>
+                    <span class="card-rating"><i class="fa-solid fa-star"></i> {{ vehicle.rating }}</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="vehicle-title">{{ vehicle.name }}</h3>
+                    <div class="vehicle-location">
+                        <i class="fa-solid fa-location-dot" style="color: var(--accent-blue);"></i> {{ vehicle.location }} &nbsp;|&nbsp; <i class="fa-solid fa-tag" style="color: var(--accent-blue);"></i> {{ vehicle.category.name }}
+                    </div>
+                    <div class="vehicle-specs">
+                        <div class="spec-item">
+                            <i class="fa-solid fa-gas-pump"></i>
+                            <span>{{ vehicle.fuel_type }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>{{ vehicle.transmission }}</span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-users"></i>
+                            <span>{{ vehicle.seats }} Seats</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price-tag">
+                            <span class="amount">₹{{ vehicle.price_per_day|floatformat:0 }}</span>
+                            <span class="unit"> / day</span>
+                        </div>
+                        <a href="{% url 'vehicles:detail' vehicle.id %}" class="btn btn-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: var(--bg-card); border-radius: var(--radius-lg);">
+                <h3>Fleet loading — Call WheelX at <strong>+91 96244 97998</strong> for live availability.</h3>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="{% url 'vehicles:list' %}" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1rem;">
+                <i class="fa-solid fa-layer-group"></i> Explore Full WheelX Fleet
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ FREQUENTLY ASKED QUESTIONS ═══════════ -->
+<section class="section">
+    <div class="container" style="max-width: 920px;">
+        <div class="section-header">
+            <span class="section-subtitle">Rental Guidelines</span>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-desc">Quick answers to common questions about renting a car or bike with WheelX in Morbi.</p>
+        </div>
+
+        <div class="faq-box-3d">
+            <h4><i class="fa-solid fa-circle-question" style="color: var(--accent-blue);"></i> What documents are required to rent a vehicle?</h4>
+            <p>You need a valid Driving License (DL) and a government-issued photo ID proof (Aadhaar Card or Passport). Document verification takes less than 5 minutes at pickup.</p>
+        </div>
+
+        <div class="faq-box-3d">
+            <h4><i class="fa-solid fa-circle-question" style="color: var(--accent-blue);"></i> Is security deposit required?</h4>
+            <p>We maintain minimal, fully refundable security deposits for all self-drive cars and bikes, refunded immediately upon vehicle return.</p>
+        </div>
+
+        <div class="faq-box-3d">
+            <h4><i class="fa-solid fa-circle-question" style="color: var(--accent-blue);"></i> Are there kilometre limits on daily rentals?</h4>
+            <p>Our standard daily rental packages come with generous daily kilometre allowances, with optional unlimited km upgrades available upon request.</p>
+        </div>
+
+        <div class="faq-box-3d">
+            <h4><i class="fa-solid fa-circle-question" style="color: var(--accent-blue);"></i> Can I book a vehicle for outstation travel from Morbi?</h4>
+            <p>Yes! All WheelX vehicles carry valid Gujarat state permits and comprehensive insurance, making them ready for intercity trips to Rajkot, Ahmedabad, Dwarka, Somnath, and beyond.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

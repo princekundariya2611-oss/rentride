@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Message Sent | WheelX Morbi{% endblock %}
+
+{% block content %}
+<section class="section" style="background: #F0F7FF; padding: 60px 0 80px;">
+    <div class="container" style="max-width: 720px;">
+        <div style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); border-radius: var(--radius-lg); padding: 50px 40px; text-align: center; box-shadow: var(--shadow-card);">
+            
+            <div style="width: 90px; height: 90px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10B981; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 24px;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <h2 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--accent-navy);">Contact Request Saved!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 1.05rem;">
+                Thank you <strong style="color: var(--accent-navy);">{{ contact_msg.name }}</strong>. Your message has been saved in our database and prepared to send directly to WheelX (+91 96244 97998).
+            </p>
+
+            <!-- Message Summary Card -->
+            <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-md); padding: 26px; text-align: left; margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid rgba(14, 165, 233, 0.15); margin-bottom: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Sender Name:</span>
+                    <strong style="color: var(--accent-navy);">{{ contact_msg.name }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid rgba(14, 165, 233, 0.15); margin-bottom: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Contact Phone:</span>
+                    <strong style="color: var(--accent-navy);">+91 {{ contact_msg.phone }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid rgba(14, 165, 233, 0.15); margin-bottom: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Destination Number:</span>
+                    <strong style="color: var(--accent-blue-dark); font-weight: 800;">+91 96244 97998 (WheelX SMS)</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-secondary); font-weight: 600; display: block; margin-bottom: 6px;">Your Message:</span>
+                    <p style="background: #FFF; border: 1px solid rgba(14, 165, 233, 0.15); padding: 12px; border-radius: var(--radius-sm); color: var(--accent-navy); margin: 0; font-size: 0.95rem;">
+                        {{ contact_msg.message }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Direct Dispatch Options -->
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                
+                <!-- SMS Messenger Button -->
+                <a href="{{ sms_url }}" class="btn btn-primary btn-lg" style="padding: 15px; font-size: 1.05rem;">
+                    <i class="fa-solid fa-comment-sms"></i> Send SMS Messenger to +91 96244 97998
+                </a>
+
+                <!-- WhatsApp Button -->
+                <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-whatsapp btn-lg" style="padding: 14px; font-size: 1rem;">
+                    <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp (+91 96244 97998)
+                </a>
+
+                <!-- Phone Support Button -->
+                <a href="tel:9624497998" class="btn btn-secondary" style="padding: 12px;">
+                    <i class="fa-solid fa-phone"></i> Call WheelX Directly (96244 97998)
+                </a>
+
+                <a href="{% url 'home:contact' %}" style="color: var(--accent-blue-dark); margin-top: 10px; font-size: 0.92rem; font-weight: 600;">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Contact Page
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Auto Launch SMS app on mobile/desktop -->
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            window.location.href = "{{ sms_url }}";
+        }, 600);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WheelX | Premier Vehicle Rentals in Morbi{% endblock %}</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="WheelX - Best self-drive cars, luxury vehicles, and bike rentals in Morbi, Gujarat. Contact +91 96244 97998 for instant booking.">
+    <meta name="keywords" content="WheelX, Car Rental Morbi, Rent Bike Morbi, Self Drive Cars Morbi, Rental Vehicles Morbi">
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-info">
+                <span><i class="fa-solid fa-location-dot"></i> Morbi, Gujarat</span>
+                <span><i class="fa-solid fa-phone"></i> Call/WhatsApp: +91 96244 97998</span>
+                <span><i class="fa-solid fa-clock"></i> 24/7 Rental Support</span>
+            </div>
+            <div class="top-socials">
+                <a href="https://wa.me/919624497998" target="_blank" style="color: #25D366; font-weight: 600;">
+                    <i class="fa-brands fa-whatsapp"></i> Quick Inquiry
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="{% url 'home:index' %}" class="logo">
+                Wheel<span>X</span>
+                <span class="logo-badge">Morbi</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="{% url 'home:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Home</a></li>
+                <li><a href="{% url 'vehicles:list' %}" class="{% if request.resolver_match.url_name == 'list' %}active{% endif %}">Our Fleet</a></li>
+                <li><a href="{% url 'home:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About WheelX</a></li>
+                <li><a href="{% url 'home:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact Us</a></li>
+            </ul>
+
+            <div class="header-actions">
+                <a href="tel:9624497998" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-phone"></i> 96244 97998
+                </a>
+                <a href="{% url 'vehicles:list' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-car"></i> Rent Now
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="container" style="margin-top: 20px;">
+        {% for message in messages %}
+        <div style="padding: 13px 18px; border-radius: var(--radius-md); margin-bottom: 10px; font-weight: 600;
+                    {% if message.tags == 'error' %}background: rgba(220,38,38,0.1); border: 1px solid #DC2626; color: #7F1D1D;
+                    {% else %}background: rgba(5,150,105,0.1); border: 1px solid #059669; color: #064E3B;{% endif %}">
+            <i class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i> {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page Body -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="{% url 'home:index' %}" class="logo">Wheel<span>X</span></a>
+                    <p>Morbi's trusted vehicle rental service. Providing premium self-drive cars, luxury sedans, SUVs, and bikes with transparent pricing and 24/7 assistance.</p>
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <a href="https://wa.me/919624497998" class="btn btn-whatsapp btn-sm"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home:index' %}">Home</a></li>
+                        <li><a href="{% url 'vehicles:list' %}">Explore Fleet</a></li>
+                        <li><a href="{% url 'home:about' %}">About Us</a></li>
+                        <li><a href="{% url 'home:contact' %}">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'vehicles:list' %}?type=CAR">Cars & SUVs</a></li>
+                        <li><a href="{% url 'vehicles:list' %}?type=BIKE">Bikes & Scooters</a></li>
+                        <li><a href="{% url 'vehicles:list' %}?sort=price_low">Budget Rentals</a></li>
+                        <li><a href="{% url 'vehicles:list' %}?sort=rating">Top Rated Fleet</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Contact WheelX</h4>
+                    <ul class="footer-links" style="color: rgba(255, 255, 255, 0.85);">
+                        <li style="display: flex; gap: 10px;"><i class="fa-solid fa-location-dot" style="color: #7DD3FC; margin-top: 4px;"></i> Morbi, Gujarat, India</li>
+                        <li style="display: flex; gap: 10px;"><i class="fa-solid fa-phone" style="color: #7DD3FC; margin-top: 4px;"></i> <a href="tel:9624497998" style="color: rgba(255, 255, 255, 0.85);">+91 96244 97998</a></li>
+                        <li style="display: flex; gap: 10px;"><i class="fa-solid fa-envelope" style="color: #7DD3FC; margin-top: 4px;"></i> info@wheelxmorbi.com</li>
+                        <li style="display: flex; gap: 10px;"><i class="fa-solid fa-clock" style="color: #7DD3FC; margin-top: 4px;"></i> Mon - Sun: 7:00 AM - 10:00 PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} WheelX Vehicle Rentals Morbi. Founded & Operated by <strong>Prince Patel</strong> | Luxuria Business Park, Morbi, Gujarat.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 3D Graphics & Animation Engines -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="{% static 'js/main.js' %}?v=1.3"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

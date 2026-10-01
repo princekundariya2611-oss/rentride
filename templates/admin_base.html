@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Portal | WheelX{% endblock %}</title>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --admin-bg: #F3F4F6;
+            --admin-sidebar: #1E293B;
+            --admin-accent: #3B82F6;
+            --admin-text-light: #F8FAFC;
+            --admin-text-dark: #0F172A;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--admin-bg);
+            color: var(--admin-text-dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar styling */
+        .admin-sidebar {
+            width: 260px;
+            background: var(--admin-sidebar);
+            color: var(--admin-text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-brand {
+            padding: 24px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-brand span {
+            color: var(--admin-accent);
+        }
+
+        .admin-nav {
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .admin-nav-item:hover, .admin-nav-item.active {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-left: 4px solid var(--admin-accent);
+        }
+
+        .admin-nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 260px; /* offset for sidebar */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-topbar {
+            height: 70px;
+            background: #fff;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--admin-accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .admin-content {
+            padding: 30px;
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s ease;
+        }
+        .btn-outline {
+            border: 1px solid #CBD5E1;
+            color: #475569;
+            background: #fff;
+        }
+        .btn-outline:hover {
+            background: #F1F5F9;
+        }
+        .btn-primary {
+            background: var(--admin-accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2563EB;
+        }
+
+        /* Flash Messages */
+        .admin-messages {
+            margin-bottom: 20px;
+        }
+        .admin-msg {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .msg-success { background: #D1FAE5; color: #065F46; border: 1px solid #34D399; }
+        .msg-error { background: #FEE2E2; color: #991B1B; border: 1px solid #F87171; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <a href="{% url 'bookings:dashboard' %}" class="admin-brand">
+            <i class="fa-solid fa-shield-halved"></i> Wheel<span>X</span>
+        </a>
+        <nav class="admin-nav">
+            <a href="{% url 'bookings:dashboard' %}" class="admin-nav-item active">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{% url 'admin:index' %}" class="admin-nav-item">
+                <i class="fa-solid fa-database"></i> Core Database
+            </a>
+            <a href="{% url 'home:index' %}" class="admin-nav-item" target="_blank">
+                <i class="fa-solid fa-globe"></i> View Live Site
+            </a>
+        </nav>
+        
+        <div style="padding: 20px;">
+            <a href="{% url 'admin:logout' %}" class="btn btn-outline" style="display: block; text-align: center; color: #fff; background: rgba(255,255,255,0.1); border-color: transparent;">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        
+        <!-- Topbar -->
+        <header class="admin-topbar">
+            <div>
+                <h2 style="font-size: 1.3rem; font-weight: 700; color: #334155;">{% block page_title %}Management Dashboard{% endblock %}</h2>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                    <span>{{ request.user.username|title }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div class="admin-content">
+            {% if messages %}
+            <div class="admin-messages">
+                {% for message in messages %}
+                <div class="admin-msg {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    <i class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i> {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

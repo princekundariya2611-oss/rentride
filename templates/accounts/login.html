@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login | WheelX Vehicle Rentals{% endblock %}
+
+{% block content %}
+<section class="login-section">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fas fa-car"></i>
+        </div>
+        <h1>Welcome Back</h1>
+        <p>Sign in to your WheelX account</p>
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_username"><i class="fas fa-user"></i> Username</label>
+          <input type="text" id="id_username" name="username" placeholder="Enter your username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="id_password"><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="id_password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p>Don't have an account? <a href="{% url 'home:index' %}">Contact us</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.login-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a1628 0%, #1a2d4f 50%, #0d2137 100%);
+  padding: 2rem 1rem;
+}
+.login-container {
+  width: 100%;
+  max-width: 420px;
+}
+.login-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+.login-header { text-align: center; margin-bottom: 2rem; }
+.login-logo {
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.8rem; color: white;
+}
+.login-header h1 { color: #fff; font-size: 1.7rem; margin-bottom: 0.3rem; }
+.login-header p { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label {
+  display: block; color: rgba(255,255,255,0.7);
+  font-size: 0.85rem; font-weight: 600;
+  margin-bottom: 0.5rem; letter-spacing: 0.05em;
+}
+.form-group label i { margin-right: 0.4rem; color: #f59e0b; }
+.form-group input {
+  width: 100%; padding: 0.85rem 1rem;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px; color: #fff;
+  font-size: 0.95rem; transition: all 0.3s;
+  box-sizing: border-box;
+}
+.form-group input::placeholder { color: rgba(255,255,255,0.3); }
+.form-group input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  background: rgba(245,158,11,0.08);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+}
+.btn-login {
+  width: 100%; padding: 1rem;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white; border: none; border-radius: 10px;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  letter-spacing: 0.05em; margin-top: 0.5rem;
+}
+.btn-login:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,158,11,0.3); }
+.login-footer { text-align: center; margin-top: 1.5rem; }
+.login-footer p { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+.login-footer a { color: #f59e0b; text-decoration: none; font-weight: 600; }
+.login-footer a:hover { text-decoration: underline; }
+.alert { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; }
+.alert-error { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+.alert-success { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+</style>
+{% endblock %}

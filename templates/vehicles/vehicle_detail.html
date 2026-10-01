@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ vehicle.brand }} {{ vehicle.name }} | Rent in Morbi | WheelX{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 40px; background: #F0F7FF;">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div style="margin-bottom: 24px; color: var(--text-secondary); font-size: 0.92rem; font-weight: 500;">
+            <a href="{% url 'home:index' %}" style="color: var(--accent-blue-dark); text-decoration: none;">Home</a> &gt; 
+            <a href="{% url 'vehicles:list' %}" style="color: var(--accent-blue-dark); text-decoration: none;">Fleet</a> &gt; 
+            <span style="color: var(--accent-navy); font-weight: 700;">{{ vehicle.brand }} {{ vehicle.name }}</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: flex-start;">
+            <!-- Left Column: Vehicle Image Showcase & Specs -->
+            <div>
+                <div style="position: relative; background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.15), transparent 70%), #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 30px; box-shadow: 0 12px 32px rgba(12, 60, 110, 0.12); transform-style: preserve-3d;">
+                    <canvas id="detail-3d-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;"></canvas>
+                    <img src="{{ vehicle.get_display_image }}" alt="{{ vehicle.name }}" style="position: relative; z-index: 2; width: 100%; height: 400px; object-fit: cover; transition: transform 0.5s ease;" onerror="this.src='{% static 'image/vehicle/car.png' %}'">
+                </div>
+
+                <div style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 22px; color: var(--accent-navy); display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> Specifications & Features
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px;">
+                        <!-- Spec Item 1 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-gas-pump"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Fuel Type</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.fuel_type }}</strong>
+                        </div>
+                        
+                        <!-- Spec Item 2 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-gear"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Transmission</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.transmission }}</strong>
+                        </div>
+                        
+                        <!-- Spec Item 3 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Seating Capacity</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.seats }} Persons</strong>
+                        </div>
+                        
+                        <!-- Spec Item 4 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-gauge-high"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Mileage</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.mileage }}</strong>
+                        </div>
+                        
+                        <!-- Spec Item 5 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Model Year</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.year }}</strong>
+                        </div>
+                        
+                        <!-- Spec Item 6 -->
+                        <div style="background: #F0F7FF; border: 1.5px solid rgba(14, 165, 233, 0.18); padding: 18px 14px; border-radius: var(--radius-md); text-align: center;">
+                            <div style="width: 42px; height: 42px; background: rgba(14, 165, 233, 0.12); color: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--accent-blue-dark); text-transform: uppercase; letter-spacing: 0.5px;">Pickup Location</span>
+                            <strong style="color: var(--accent-navy); font-size: 1rem; font-weight: 800; display: block; margin-top: 2px;">{{ vehicle.location }}</strong>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 1.15rem; margin-bottom: 12px; color: var(--accent-navy);"><i class="fa-solid fa-star-of-life" style="color: var(--accent-blue); font-size: 0.85rem;"></i> Included Vehicle Features</h4>
+                    <p style="color: var(--text-secondary); line-height: 1.8; font-size: 0.98rem; background: #F8FAFC; padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--accent-blue);">{{ vehicle.features }}</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Pricing & Booking Form Card -->
+            <div style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-lg); padding: 32px; position: sticky; top: 100px; box-shadow: var(--shadow-card);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                    <div>
+                        <span style="color: var(--accent-blue-dark); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">{{ vehicle.brand }}</span>
+                        <h2 style="font-size: 2.1rem; color: var(--accent-navy); line-height: 1.2; margin-top: 4px;">{{ vehicle.name }}</h2>
+                    </div>
+                    <span class="card-rating" style="position: static; background: #FEF3C7; color: #92400E; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 800;"><i class="fa-solid fa-star" style="color: #F59E0B;"></i> {{ vehicle.rating }}</span>
+                </div>
+
+                <!-- Rate Display Banner -->
+                <div style="background: linear-gradient(135deg, #EBF6FF 0%, #F5FAFF 100%); border: 1.5px solid rgba(14, 165, 233, 0.25); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 26px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Daily Rental Rate</span>
+                        <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 2px;">
+                            <span style="font-size: 2.1rem; font-weight: 900; color: var(--accent-blue);">₹{{ vehicle.price_per_day|floatformat:0 }}</span>
+                            <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);">/ 24 Hours</span>
+                        </div>
+                    </div>
+                    <span style="background: #10B981; color: #FFFFFF; font-size: 0.78rem; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-full); letter-spacing: 0.8px;">AVAILABLE</span>
+                </div>
+
+                <!-- Real-Time Price Calculator & Instant Booking Form -->
+                <h3 style="font-size: 1.25rem; margin-bottom: 18px; color: var(--accent-navy); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-calculator" style="color: var(--accent-blue);"></i> Real-Time Fare Calculator & Booking
+                </h3>
+                
+                <form action="{% url 'bookings:create' vehicle.id %}" method="POST" id="vehicle_booking_form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Full Name</label>
+                        <input type="text" name="customer_name" class="form-control" placeholder="e.g. Ramesh Patel" required style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Phone Number</label>
+                        <input type="tel" name="customer_phone" class="form-control" placeholder="e.g. 9624497998" required style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Pickup Date</label>
+                            <input type="date" id="id_start_date" data-price="{{ vehicle.price_per_day }}" data-type="{{ vehicle.vehicle_type }}" name="start_date" class="form-control" required style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: var(--accent-navy);">Drop-off Date</label>
+                            <input type="date" id="id_end_date" name="end_date" class="form-control" required style="background: #FFFFFF; border: 1.5px solid rgba(14, 165, 233, 0.25); font-weight: 600;">
+                        </div>
+                    </div>
+
+                    <!-- Add-ons Selection -->
+                    <div style="margin-bottom: 20px; background: #F0F7FF; border: 1px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-md); padding: 14px 16px;">
+                        <label style="font-weight: 700; color: var(--accent-navy); font-size: 0.88rem; display: block; margin-bottom: 10px;">
+                            <i class="fa-solid fa-puzzle-piece" style="color: var(--accent-blue);"></i> Select Rental Add-ons
+                        </label>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                                <span><input type="checkbox" id="addon_insurance" class="addon-checkbox" style="accent-color: var(--accent-blue);"> Zero-Dep Liability Coverage</span>
+                                <strong style="color: var(--accent-blue-dark);">+₹150/day</strong>
+                            </label>
+
+                            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                                <span><input type="checkbox" id="addon_unlimited" class="addon-checkbox" style="accent-color: var(--accent-blue);"> Unlimited Km Package</span>
+                                <strong style="color: var(--accent-blue-dark);">+₹250/day</strong>
+                            </label>
+
+                            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; cursor: pointer; color: var(--accent-navy);">
+                                <span><input type="checkbox" id="addon_delivery" class="addon-checkbox" style="accent-color: var(--accent-blue);"> Doorstep Pickup/Drop in Morbi</span>
+                                <strong style="color: var(--accent-blue-dark);">+₹200 flat</strong>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Express KYC Verification Section -->
+                    <div style="margin-bottom: 20px; background: #F8FAFC; border: 1.5px dashed rgba(14, 165, 233, 0.4); border-radius: var(--radius-md); padding: 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="font-weight: 800; color: var(--accent-navy); font-size: 0.9rem; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-id-card" style="color: var(--accent-blue);"></i> Express KYC Verification <span style="color: #DC2626; font-weight: 800;">*</span>
+                            </label>
+                            <span style="font-size: 0.72rem; font-weight: 800; background: #FEE2E2; color: #991B1B; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.3px;">1 OPTION COMPULSORY</span>
+                        </div>
+                        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.45;">
+                            Provide details for <strong>either Driving License OR Aadhaar Card</strong> (Number or Photo) to enable fast-track 2-minute handover at Luxuria Business Park.
+                        </p>
+
+                        <!-- Option 1: Driving License -->
+                        <div style="background: #FFFFFF; padding: 12px 14px; border-radius: 8px; border: 1.5px solid rgba(14, 165, 233, 0.22); margin-bottom: 10px;">
+                            <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-blue-dark); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fa-solid fa-id-badge" style="color: var(--accent-blue);"></i> Option 1: Driving License</span>
+                            </div>
+                            <div class="form-row" style="margin-bottom: 0;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.74rem; font-weight: 700; color: var(--accent-navy);">DL Number</label>
+                                    <input type="text" id="id_dl_number" name="driving_license_no" class="form-control" placeholder="e.g. GJ03-2023001234" style="font-size: 0.82rem; background: #FFF;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.74rem; font-weight: 700; color: var(--accent-navy);">DL Photo</label>
+                                    <input type="file" id="id_dl_doc" name="driving_license_doc" accept="image/*,.pdf" class="form-control" style="font-size: 0.82rem; background: #FFF; padding: 6px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; font-size: 0.76rem; font-weight: 800; color: var(--accent-navy); margin: 8px 0; letter-spacing: 1px;">— OR —</div>
+
+                        <!-- Option 2: Aadhaar Card -->
+                        <div style="background: #FFFFFF; padding: 12px 14px; border-radius: 8px; border: 1.5px solid rgba(14, 165, 233, 0.22);">
+                            <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-blue-dark); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fa-solid fa-address-card" style="color: var(--accent-blue);"></i> Option 2: Aadhaar Card</span>
+                            </div>
+                            <div class="form-row" style="margin-bottom: 0;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.74rem; font-weight: 700; color: var(--accent-navy);">Aadhaar No.</label>
+                                    <input type="text" id="id_aadhaar_number" name="aadhaar_no" class="form-control" placeholder="12-digit Aadhaar No." style="font-size: 0.82rem; background: #FFF;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.74rem; font-weight: 700; color: var(--accent-navy);">Aadhaar Photo</label>
+                                    <input type="file" id="id_aadhaar_doc" name="aadhaar_doc" accept="image/*,.pdf" class="form-control" style="font-size: 0.82rem; background: #FFF; padding: 6px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Price Breakdown Card -->
+                    <div style="background: linear-gradient(135deg, #0C3C6E 0%, #0284C7 100%); border-radius: var(--radius-md); padding: 20px; margin-bottom: 22px; color: #FFFFFF; box-shadow: 0 6px 20px rgba(12, 60, 110, 0.22);">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.9; margin-bottom: 6px;">
+                            <span>Base Rental (<span id="calc_days_count">1 day</span>)</span>
+                            <span id="calc_base_fare" style="font-weight: 700;">₹0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.9; margin-bottom: 6px;">
+                            <span>Selected Add-ons</span>
+                            <span id="calc_addons_total" style="font-weight: 700;">₹0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.9; margin-bottom: 6px;">
+                            <span>GST (18%)</span>
+                            <span id="calc_gst_amount" style="font-weight: 700;">₹0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.88rem; opacity: 0.9; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.25);">
+                            <span>Refundable Security Deposit</span>
+                            <span id="calc_deposit_amount" style="font-weight: 700; color: #7DD3FC;">₹1,000</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.85); font-weight: 600; display: block;">Total Payable at Pickup</span>
+                                <span style="font-size: 0.72rem; color: #7DD3FC;">(Includes refundable deposit)</span>
+                            </div>
+                            <span id="calc_total_price" style="font-size: 1.85rem; font-weight: 900; color: #FFFFFF;">₹0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+                        <i class="fa-solid fa-car"></i> Confirm Rental Request
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="https://wa.me/919624497998?text=Hello%20WheelX,%20I%20want%20to%20rent%20the%20{{ vehicle.brand }}%20{{ vehicle.name }}" target="_blank" class="btn btn-whatsapp" style="width: 100%; padding: 12px;">
+                        <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp (+91 96244 97998)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
